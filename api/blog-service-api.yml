@@ -1,0 +1,103 @@
+openapi: "3.0.2"
+info:
+  title: Blog Service API
+  version: "1.0.0"
+servers:
+  - url: http://127.0.0.1:8083
+paths:
+  /{author}:
+    get:
+      summary: Get blog posts by author
+      parameters:
+        - name: author
+          description: Author User ID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Blog posts by author
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-blog-posts"
+        400:
+          description: Bad request (No such user)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    post:
+      summary: Create blog post
+      parameters:
+        - name: author
+          description: Author User ID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Blog post parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/create-blog-post"
+      responses:
+        201:
+          description: Blog post created
+        403:
+          description: Forbidden (someone else's blog)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+components:
+  schemas:
+    get-blog-posts:
+      type: array
+      items:
+        type: object
+        required:
+          - id
+          - author
+          - title
+        properties:
+          id:
+            type: integer
+          author:
+            type: integer
+          title:
+            type: string
+          content:
+            type: string
+    create-blog-post:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+    error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

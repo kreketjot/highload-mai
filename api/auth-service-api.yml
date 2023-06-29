@@ -1,0 +1,69 @@
+openapi: "3.0.2"
+info:
+  title: Auth Service API
+  version: "1.0.0"
+servers:
+  - url: http://127.0.0.1:8081
+paths:
+  /check-authorization:
+    get:
+      summary: Check authorization
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Authorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/is-authorized-response"
+  /register:
+    post:
+      summary: Add user credentials
+      requestBody:
+        description: User credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/credentials"
+      responses:
+        201:
+          description: User credentials has added
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+components:
+  schemas:
+    is-authorized-response:
+      type: object
+      required:
+        - isAuthorized
+      properties:
+        isAuthorized:
+          type: boolean
+    credentials:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

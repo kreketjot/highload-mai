@@ -1,0 +1,150 @@
+openapi: "3.0.2"
+info:
+  title: User Service API
+  version: "1.0.0"
+servers:
+  - url: http://127.0.0.1:8082
+paths:
+  /:
+    get:
+      summary: Get all users
+      responses:
+        200:
+          description: Users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-users"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    post:
+      summary: Create user
+      requestBody:
+        description: User info
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/create-user"
+      responses:
+        201:
+          description: User created
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /{userId}:
+    get:
+      summary: Get user by id
+      parameters:
+        - name: userId
+          description: User ID
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-user"
+        404:
+          description: Not found (No such user)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /search:
+    get:
+      summary: Get user by name mask
+      parameters:
+        - name: firstName
+          description: First name mask
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: lastName
+          description: Last name mask
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Users by provided name mask
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-users"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+components:
+  schemas:
+    get-users:
+      type: array
+      items:
+        $ref: "#/components/schemas/get-user"
+    get-user:
+      type: object
+      required:
+        - id
+        - login
+        - firstName
+        - lastName
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        title:
+          type: string
+    create-user:
+      type: object
+      required:
+        - login
+        - firstName
+        - lastName
+      properties:
+        login:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        title:
+          type: string
+    error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

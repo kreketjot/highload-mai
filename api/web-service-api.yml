@@ -1,0 +1,308 @@
+openapi: "3.0.2"
+info:
+  title: Web Service API
+  version: "1.0.0"
+servers:
+  - url: http://127.0.0.1:8080
+paths:
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        200:
+          description: Users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-users"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /signup:
+    post:
+      summary: Sign up
+      requestBody:
+        description: User info
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/create-user"
+      responses:
+        201:
+          description: User created
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /users/{userId}:
+    get:
+      summary: Get user by id
+      parameters:
+        - name: userId
+          description: User ID
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-user"
+        404:
+          description: Not found (No such user)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /users/search:
+    get:
+      summary: Get user by name mask
+      parameters:
+        - name: firstName
+          description: First name mask
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: lastName
+          description: Last name mask
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Users by provided name mask
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-users"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /blog/{author}:
+    get:
+      summary: Get blog posts by author
+      parameters:
+        - name: author
+          description: Author User ID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Blog posts by author
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-blog-posts"
+        400:
+          description: Bad request (No such user)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    post:
+      summary: Create blog post
+      parameters:
+        - name: author
+          description: Author User ID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Blog post parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/create-blog-post"
+      responses:
+        201:
+          description: Blog post created
+        403:
+          description: Forbidden (someone else's blog)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /messanger/{userId}:
+    get:
+      summary: Get chat messages with provided user
+      parameters:
+        - name: userId
+          description: Interlocutor User ID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Chat messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-chat-messages"
+        400:
+          description: Bad request (No such user)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    post:
+      summary: Send message to provided user
+      requestBody:
+        description: Message content
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        201:
+          description: Message has sent
+        400:
+          description: Bad request (No such user)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+components:
+  schemas:
+    get-users:
+      type: array
+      items:
+        $ref: "#/components/schemas/get-user"
+    get-user:
+      type: object
+      required:
+        - id
+        - login
+        - firstName
+        - lastName
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        title:
+          type: string
+    create-user:
+      type: object
+      required:
+        - login
+        - firstName
+        - lastName
+      properties:
+        login:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        title:
+          type: string
+    get-blog-posts:
+      type: array
+      items:
+        type: object
+        required:
+          - id
+          - author
+          - title
+        properties:
+          id:
+            type: integer
+          author:
+            type: integer
+          title:
+            type: string
+          content:
+            type: string
+    create-blog-post:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+    get-chat-messages:
+      type: array
+      items:
+        type: object
+        required:
+          - id
+          - sender
+          - recipient
+          - content
+        properties:
+          id:
+            type: integer
+          sender:
+            type: integer
+          recipient:
+            type: integer
+          content:
+            type: string
+    error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

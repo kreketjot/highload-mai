@@ -1,0 +1,98 @@
+openapi: "3.0.2"
+info:
+  title: Messanger Service API
+  version: "1.0.0"
+servers:
+  - url: http://127.0.0.1:8084
+paths:
+  /{userId}:
+    get:
+      summary: Get chat messages with provided user
+      parameters:
+        - name: userId
+          description: Interlocutor User ID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Chat messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/get-chat-messages"
+        400:
+          description: Bad request (No such user)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    post:
+      summary: Send message to provided user
+      requestBody:
+        description: Message content
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/send-message"
+      responses:
+        201:
+          description: Message has sent
+        400:
+          description: Bad request (No such user)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+components:
+  schemas:
+    get-chat-messages:
+      type: array
+      items:
+        type: object
+        required:
+          - id
+          - sender
+          - recipient
+          - content
+        properties:
+          id:
+            type: integer
+          sender:
+            type: integer
+          recipient:
+            type: integer
+          content:
+            type: string
+    send-message:
+      type: object
+      required:
+        - sender
+        - content
+      properties:
+        sender:
+          type: integer
+        content:
+          type: string
+    error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
